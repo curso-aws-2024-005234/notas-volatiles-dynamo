@@ -3,12 +3,17 @@
 {% block title %}Crear nota volátil{% endblock %}
 
 {% block content %}
-    <h1>Crear nota volátil</h1>
-    <form action="{{ url_for('crear_nota') }}" method="POST">
-        <label for="titulo">Titulo</label><br>
-        <input type="text" name="titulo" id="titulo" required><br>
-        <label for="texto">Texto</label><br>
-        <textarea name="texto" id="texto" cols="30" rows="10" required></textarea><br>
-        <input type="submit" value="Crear">
+    <h1>Crear nueva nota volátil</h1>
+    <form class="form" action="{{ url_for('crear_nota') }}" method="POST">
+        <div class="form-group">
+            <label for="titulo">Titulo</label><br>
+            <input class="form-control" type="text" name="titulo" id="titulo" required><br>
+        </div>
+        <div class="form-group">
+            <label for="texto">Texto</label><br>
+            <textarea class="form-control" name="texto" id="texto" cols="30" rows="10" required></textarea><br>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Crear y compartir nota">
+        <input class="btn btn-outline-secondary" type="reset" value="Limpiar">
     </form>
 {% endblock %}
