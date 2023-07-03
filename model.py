@@ -1,4 +1,3 @@
-import random
 import sqlite3
 from flask import g
 
@@ -28,19 +27,23 @@ class Nota:
     def create_db():
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS notas (
-                    codigo CHAR(40) PRIMARY KEY,
-                    titulo TEXT NOT NULL,
-                    texto TEXT NOT NULL
-                );
-            """)
-            conn.commit()
+            # Load schema and execute SQL commands
+            with open('schema.sql', 'r') as f:
+                cursor.executescript(f.read())
+
+
+            # cursor.execute("""
+            #     CREATE TABLE IF NOT EXISTS notas (
+            #         codigo CHAR(40) PRIMARY KEY,
+            #         titulo TEXT NOT NULL,
+            #         texto TEXT NOT NULL
+            #     );
+            # """)
+            # conn.commit()
     
     def save(self):
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            self.codigo = "".join(random.choices('abcdef0123456789', k=40))
             cursor.execute("""
                 INSERT INTO notas (codigo, titulo, texto)
                 VALUES (?, ?, ?)

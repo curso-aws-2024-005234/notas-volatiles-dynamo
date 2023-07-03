@@ -4,6 +4,7 @@
 
 {% block content %}
     <h1>{{ nota.titulo }}</h1>
-    <p>{{ nota.texto }}</p>
+    <p>{{ nota.texto|nl2br|safe }}</p>
+    <hr>
     <p class="small"><em>Esta nota se autodestruirá.</em></p>
 {% endblock %}

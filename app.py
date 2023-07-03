@@ -1,14 +1,15 @@
-import random
-import string
+import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
-
 from model import Nota
+import os
+import re
+from markupsafe import Markup, escape
 
 
 app = Flask(__name__)
 
 
-BASE_URL = 'http://127.0.0.1:5000'
+APP_BASE_URL =  os.environ.get('APP_BASE_URL', 'http://127.0.0.1:5000')
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -18,10 +19,10 @@ def crear_nota():
             if not request.form['titulo'] or not request.form['texto']:
                 flash('Falta el titulo o el texto')
                 return redirect(url_for('crear_nota'))
-            codigo = "".join(random.choices(string.hexdigits, k=40))
+            codigo = "".join(secrets.token_urlsafe(42))
             nota = Nota(codigo, request.form['titulo'], request.form['texto'])
             nota.save()
-            return render_template('enlace.html', baseurl=BASE_URL, nota=nota)
+            return render_template('enlace.html', baseurl=APP_BASE_URL, nota=nota)
         elif request.method == 'GET':
             return render_template('crear_nota.html')
 
@@ -38,6 +39,7 @@ def ver_nota(codigo):
             abort(404, description="No existe la nota") 
 
 
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html', error=error)
@@ -47,3 +49,12 @@ if __name__ == '__main__':
         Nota.create_db()
 
     app.run(debug=True)
+
+
+
+
+
+@app.template_filter('nl2br')
+def nl2br(value):
+    """Converts newlines in text to HTML-tags"""
+    return "<br>".join(re.split(r'(?:\r\n|\r|\n)', escape(value)))
