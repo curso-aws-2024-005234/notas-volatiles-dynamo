@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}{{nota}}{% endblock %}
+
+{% block content %}
+    {{nota.codigo}}
+    <h1>{{ nota.titulo }}</h1>
+    <p>{{ nota.texto }}</p>
+    <p>Esta nota se autodestruirá.</p>
+{% endblock %}

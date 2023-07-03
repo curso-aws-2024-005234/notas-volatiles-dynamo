@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Enlace a la nota secreta{% endblock %}
+
+{% block content %}
+    <h1>Enlace a la nota secreta</h1>
+    <p>Comparte este enlace con quien quieras:</p>
+    <p><code>{{baseurl}}{{ url_for('ver_nota', codigo=nota.codigo) }}</code></p>
+{% endblock %}
