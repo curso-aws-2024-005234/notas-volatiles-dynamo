@@ -1,6 +1,6 @@
 import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
-from model import Nota
+from model import Nota, create_db
 import os
 import re
 from markupsafe import Markup, escape
@@ -44,17 +44,15 @@ def ver_nota(codigo):
 def page_not_found(error):
     return render_template('404.html', error=error)
 
-if __name__ == '__main__':
-    with app.app_context():
-        Nota.create_db()
-
-    app.run(debug=True)
-
-
-
 
 
 @app.template_filter('nl2br')
 def nl2br(value):
     """Converts newlines in text to HTML-tags"""
     return "<br>".join(re.split(r'(?:\r\n|\r|\n)', escape(value)))
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        create_db()
+    app.run(debug=True)

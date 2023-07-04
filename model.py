@@ -11,9 +11,15 @@ def get_db_connection():
     return con
 
 
+def create_db():
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        # Load schema and execute SQL commands
+        with open('schema.sql', 'r') as f:
+            cursor.executescript(f.read())
+
 
 class Nota:
-
 
     def __init__(self, codigo, titulo, texto):
         self.codigo = codigo
@@ -22,25 +28,7 @@ class Nota:
 
     def __str__(self):
         return f'Nota: {self.titulo}'
-    
-    @staticmethod
-    def create_db():
-        with get_db_connection() as conn:
-            cursor = conn.cursor()
-            # Load schema and execute SQL commands
-            with open('schema.sql', 'r') as f:
-                cursor.executescript(f.read())
-
-
-            # cursor.execute("""
-            #     CREATE TABLE IF NOT EXISTS notas (
-            #         codigo CHAR(40) PRIMARY KEY,
-            #         titulo TEXT NOT NULL,
-            #         texto TEXT NOT NULL
-            #     );
-            # """)
-            # conn.commit()
-    
+        
     def save(self):
         with get_db_connection() as conn:
             cursor = conn.cursor()
