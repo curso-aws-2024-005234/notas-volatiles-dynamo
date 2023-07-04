@@ -1,6 +1,6 @@
 import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
-from model import Nota, create_db
+from model import Nota, create_db, generate_key
 import os
 import re
 from markupsafe import Markup, escape
@@ -55,4 +55,5 @@ def nl2br(value):
 if __name__ == '__main__':
     with app.app_context():
         create_db()
+        generate_key()
     app.run(debug=True)
