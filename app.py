@@ -1,15 +1,17 @@
 import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
 from model import Nota, create_db, generate_key
-import os
 import re
-from markupsafe import Markup, escape
+from markupsafe import escape
 
 
 app = Flask(__name__)
+#app.config.from_file('config.toml', load=tomllib.load, text=False)
+app.config.from_pyfile('config.py')
 
 
-APP_BASE_URL =  os.environ.get('APP_BASE_URL', 'http://127.0.0.1:5000')
+APP_BASE_URL = app.config['APP_BASE_URL'] # os.environ.get('APP_BASE_URL', 'http://127.0.0.1:5000')
+print(APP_BASE_URL)
 
 
 @app.route('/', methods=['GET', 'POST'])

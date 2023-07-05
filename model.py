@@ -1,19 +1,12 @@
-import sqlite3
-from flask import g
-from cryptography.fernet import Fernet
-import os
 from pathlib import Path
-
-APP_PATH = Path(os.environ.get('APP_PATH', '.'))
-
-DB_PATH = APP_PATH / 'notas.db'
-CRYPTO_KEY_PATH = APP_PATH / 'notas.key'
-
+import sqlite3
+from flask import g, current_app
+from cryptography.fernet import Fernet
 
 def get_crypt():
     fernet = getattr(g, '_crypt', None)
     if not fernet:
-        with open(CRYPTO_KEY_PATH, 'rb') as f:
+        with open(current_app.config['CRYPTO_KEY_PATH'], 'rb') as f:
             key = f.read()
             fernet = g._crypt = Fernet(key)
     return fernet
@@ -22,17 +15,18 @@ def get_crypt():
 def get_db_connection():
     con = getattr(g, '_database', None)
     if not con:
-        con = g._database = sqlite3.connect(DB_PATH)
+        con = g._database = sqlite3.connect(current_app.config['DB_PATH'])
     return con
 
 
 def generate_key():
+    keypath = Path(current_app.config['CRYPTO_KEY_PATH'])
     # Comprobar si hay fichero de clave
-    if CRYPTO_KEY_PATH.exists(): return
+    if keypath.exists(): return
     # Si no existe, generar clave
     key = Fernet.generate_key()
     # Guardar clave en fichero
-    with open(CRYPTO_KEY_PATH, 'wb') as f:
+    with open(keypath, 'wb') as f:
         f.write(key)
 
 
