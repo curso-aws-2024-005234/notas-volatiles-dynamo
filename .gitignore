@@ -1,3 +1,4 @@
 *.pyc
 notas.db
 notas.key
+/.venv
