@@ -29,14 +29,16 @@ def crear_nota():
             return render_template('crear_nota.html')
 
 
-@app.route('/<codigo>', methods=['GET'])
+@app.route('/<codigo>', methods=['GET', 'POST'])
 def ver_nota(codigo):
     with app.app_context():
-        print(codigo)
         nota = Nota.get(codigo)
         if nota:
-            nota.delete()
-            return render_template('ver_nota.html', nota=nota)
+            if request.method == 'POST':
+                nota.delete()
+                return render_template('ver_nota.html', nota=nota)
+            elif request.method == 'GET':
+                return render_template('confirmar_lectura.html', nota=nota)
         else:
             abort(404, description="No existe la nota") 
 
@@ -44,7 +46,7 @@ def ver_nota(codigo):
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template('404.html', error=error)
+    return render_template('404.html', error=error), 404
 
 
 

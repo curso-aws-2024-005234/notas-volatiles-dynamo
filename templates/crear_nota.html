@@ -5,13 +5,15 @@
 {% block content %}
     <h1>Crear nueva nota volátil</h1>
     <form class="form" action="{{ url_for('crear_nota') }}" method="POST">
-        <div class="form-group">
-            <label for="titulo">Titulo</label><br>
-            <input class="form-control" type="text" name="titulo" id="titulo" required><br>
+        <div class="form-group mb-2">
+            <label for="titulo" class="form-label">Titulo</label>
+            <input class="form-control" type="text" name="titulo" id="titulo" required aria-labelledby="titulo-help">
+            <small id="titulo-help" class="form-text text-muted">Se mostrará al destinatario cuando se solicite confirmación.</small>
         </div>
-        <div class="form-group">
-            <label for="texto">Texto</label><br>
-            <textarea class="form-control" name="texto" id="texto" cols="30" rows="10" required></textarea><br>
+        <div class="form-group mb-2">
+            <label for="texto" class="form-label">Texto</label>
+            <textarea class="form-control" name="texto" id="texto" cols="30" rows="10" required></textarea>
+            <small id="texto-help" class="form-text text-muted">Únicamente se mostrará al destinatario cuando éste haya confirmado la lectura.</small>
         </div>
         <input class="btn btn-primary" type="submit" value="Crear y compartir nota">
         <input class="btn btn-outline-secondary" type="reset" value="Limpiar">
