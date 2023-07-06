@@ -5,6 +5,7 @@
 {% block content %}
     <h1>Crear nueva nota volátil</h1>
     <form class="form" action="{{ url_for('crear_nota') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group mb-2">
             <label for="titulo" class="form-label">Titulo</label>
             <input class="form-control" type="text" name="titulo" id="titulo" required aria-labelledby="titulo-help">

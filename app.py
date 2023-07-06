@@ -3,15 +3,19 @@ from flask import Flask, abort, render_template, request, redirect, url_for, fla
 from model import Nota, create_db, generate_key
 import re
 from markupsafe import escape
+from flask_wtf.csrf import CSRFProtect
 
 
 app = Flask(__name__)
+
 #app.config.from_file('config.toml', load=tomllib.load, text=False)
 app.config.from_pyfile('config.py')
 
-
 APP_BASE_URL = app.config['APP_BASE_URL'] # os.environ.get('APP_BASE_URL', 'http://127.0.0.1:5000')
 print(APP_BASE_URL)
+
+# CSRF protection
+csrf = CSRFProtect(app)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -43,10 +47,13 @@ def ver_nota(codigo):
             abort(404, description="No existe la nota") 
 
 
+@app.errorhandler(400)
+def page_not_found(error):
+    return render_template('error.html', error=error), 400
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template('404.html', error=error), 404
+    return render_template('error.html', error=error), 404
 
 
 
