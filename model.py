@@ -4,6 +4,10 @@ from flask import g, current_app
 from cryptography.fernet import Fernet
 
 def get_crypt():
+    """
+    Recupera o obxecto Fernet para cifrar e descifrar datos. Este obxecto é gardado na variable global g,
+    de xeito que se crea unha única instancia por cada petición (patrón singleton).
+    """
     fernet = getattr(g, '_crypt', None)
     if not fernet:
         with open(current_app.config['CRYPTO_KEY_PATH'], 'rb') as f:
@@ -13,6 +17,10 @@ def get_crypt():
 
 
 def get_db_connection():
+    """
+    Recupera a conexión á base de datos. Esta conexión é gardada na variable global g,
+    de xeito que se crea unha única instancia por cada petición (patrón singleton).
+    """
     con = getattr(g, '_database', None)
     if not con:
         con = g._database = sqlite3.connect(current_app.config['DB_PATH'])
@@ -20,6 +28,10 @@ def get_db_connection():
 
 
 def generate_key():
+    """
+    Xera unha clave de cifrado e gárdaa nun ficheiro. Dita clave empregarase para 
+    cifrar os datos das notas que se almacenan na base de datos.
+    """
     keypath = Path(current_app.config['CRYPTO_KEY_PATH'])
     # Comprobar si hay fichero de clave
     if keypath.exists(): return
@@ -31,6 +43,9 @@ def generate_key():
 
 
 def create_db():
+    """
+    Crea a base de datos e a táboa notas.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         # Load schema and execute SQL commands
@@ -39,6 +54,10 @@ def create_db():
 
 
 class Nota:
+    """
+    Modelo de datos para as notas.
+    Cada nota contén un código, un título e un texto.
+    """
 
     def __init__(self, codigo, titulo, texto):
         self.codigo = codigo
@@ -49,6 +68,9 @@ class Nota:
         return f'Nota: {self.titulo}'
         
     def save(self):
+        """
+        Garda a nota na base de datos.
+        """
         with get_db_connection() as conn:
             crypt = get_crypt()
             cursor = conn.cursor()
@@ -60,6 +82,9 @@ class Nota:
 
     @staticmethod
     def get(codigo):
+        """
+        Recupera unha nota da base de datos a partir do seu código único (que é chave primaria).
+        """
         with get_db_connection() as conn:
             crypt = get_crypt()
             cursor = conn.cursor()
@@ -71,6 +96,9 @@ class Nota:
 
     
     def delete(self):
+        """
+        Elimina a nota da base de datos.
+        """
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
