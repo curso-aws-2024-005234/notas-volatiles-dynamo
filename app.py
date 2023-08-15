@@ -31,7 +31,7 @@ def crear_nota():
                 flash('Falta el titulo o el texto')
                 return redirect(url_for('crear_nota'))
             codigo = "".join(secrets.token_urlsafe(42))
-            nota = Nota(codigo, request.form['titulo'], request.form['texto'])
+            nota = Nota(codigo=codigo, titulo=request.form['titulo'], texto=request.form['texto'])
             nota.save()
             return render_template('enlace.html', baseurl=APP_BASE_URL, nota=nota)
         elif request.method == 'GET':

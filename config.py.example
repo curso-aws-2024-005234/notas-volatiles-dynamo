@@ -1,4 +1,8 @@
 APP_BASE_URL = "http://localhost:5000"
 CRYPTO_KEY_PATH = "/var/local/lib/notas.key"
-DB_PATH = "/var/local/lib/notas.db"
+DB_NAME = "notas"
+DB_USER = "user"
+DB_PASSWORD = "password"
+DB_HOST = "localhost"
+DB_PORT = 3306
 SECRET_KEY = "secret-key"
