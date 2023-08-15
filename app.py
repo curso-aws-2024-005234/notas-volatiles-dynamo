@@ -1,19 +1,30 @@
 import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
-from model import Nota
-import os
+from model import Nota, create_db, generate_key
 import re
-from markupsafe import Markup, escape
+from markupsafe import escape
+from flask_wtf.csrf import CSRFProtect
 
 
 app = Flask(__name__)
 
+# Cárgase a configuración de config.py; o arquivo config.py debe estar na mesma carpeta que app.py.
+app.config.from_pyfile('config.py')
 
-APP_BASE_URL =  os.environ.get('APP_BASE_URL', 'http://127.0.0.1:5000')
+APP_BASE_URL = app.config['APP_BASE_URL']
+print(APP_BASE_URL)
+
+# Protección contra ataques CSRF
+csrf = CSRFProtect(app)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def crear_nota():
+    """
+    Procesamento da ruta para crear unha nota.
+    Cando se accede por GET, devólvese o formulario para crear a nota.
+    Cando se accede por POST, créase a nota e devólvese o enlace para ver a nota.
+    """
     with app.app_context():
         if request.method == 'POST':
             if not request.form['titulo'] or not request.form['texto']:
@@ -27,30 +38,40 @@ def crear_nota():
             return render_template('crear_nota.html')
 
 
-@app.route('/<codigo>', methods=['GET'])
+@app.route('/<codigo>', methods=['GET', 'POST'])
 def ver_nota(codigo):
+    """
+    Procesamento da ruta para ver unha nota.
+    Cando se accede por GET, devólvese unha páxina previa para solicitar a confirmación de 
+    lectura (mediante un formulario cun botón "Confirmar lectura").
+    Cando se accede por POST, devólvese a nota e elimínase da base de datos.
+    """
     with app.app_context():
-        print(codigo)
         nota = Nota.get(codigo)
         if nota:
-            nota.delete()
-            return render_template('ver_nota.html', nota=nota)
+            if request.method == 'POST':
+                nota.delete()
+                return render_template('ver_nota.html', nota=nota)
+            elif request.method == 'GET':
+                return render_template('confirmar_lectura.html', nota=nota)
         else:
             abort(404, description="No existe la nota") 
 
 
 
+@app.errorhandler(400)
+def bad_request(error):
+    """
+    Páxina de erro para o código de erro 400.
+    """
+    return render_template('error.html', error=error), 400
+
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template('404.html', error=error)
-
-if __name__ == '__main__':
-    with app.app_context():
-        Nota.create_db()
-
-    app.run(debug=True)
-
-
+    """
+    Páxina de erro para o código de erro 404.
+    """
+    return render_template('error.html', error=error), 404
 
 
 
@@ -58,3 +79,10 @@ if __name__ == '__main__':
 def nl2br(value):
     """Converts newlines in text to HTML-tags"""
     return "<br>".join(re.split(r'(?:\r\n|\r|\n)', escape(value)))
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        create_db()
+        generate_key()
+    app.run(debug=True)

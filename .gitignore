@@ -1,3 +1,6 @@
 *.pyc
 notas.db
-.venv
+notas.key
+/.venv
+.DS_Store
+config.py
