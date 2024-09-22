@@ -94,10 +94,10 @@ class Nota(db.Model):
     # def texto(self, value):
     #     self._texto = get_crypt().encrypt(str.encode(value))
 
-    @classmethod
-    def get(cls, pk):
-        with Session(get_db_engine()) as session:
-            return session.query(Nota).where(codigo=pk).first()
+    # @classmethod
+    # def get(cls, pk):
+    #     with Session(get_db_engine()) as session:
+    #         return session.query(Nota).where(codigo=pk).first()
 
 
 

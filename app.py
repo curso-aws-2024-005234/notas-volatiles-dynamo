@@ -1,6 +1,6 @@
 import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
-from model_sqlalchemy import Nota, db
+from model import Nota, db
 import re
 from markupsafe import escape
 from flask_wtf.csrf import CSRFProtect
@@ -87,4 +87,4 @@ if __name__ == '__main__':
         #create_db()
         db.create_all()
         #generate_key()
-    app.run(debug=True)
+    #app.run(debug=True)
