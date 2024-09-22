@@ -20,8 +20,8 @@ db = SQLAlchemy(model_class=Base)
 class Nota(db.Model):
     __tablename__ = 'notas'
 
-    codigo = Column(CHAR(42), primary_key=True)
-    titulo = Column(String(100), nullable=False)
+    codigo = Column(CHAR(60), primary_key=True)
+    titulo = Column(String(140), nullable=False)
     texto = Column(Text(), nullable=False)
 
     def __str__(self):

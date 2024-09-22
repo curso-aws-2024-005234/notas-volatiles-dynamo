@@ -1,10 +1,5 @@
 APP_BASE_URL = "http://localhost:5000"
-APP_NAME = "Notas volátiles"
-CRYPTO_KEY_PATH = "/var/local/lib/notas.key"
-DB_NAME = "notas"
-DB_USER = "user"
-DB_PASSWORD = "password"
-DB_HOST = "localhost"
-DB_PORT = 3306
 SECRET_KEY = "secret-key"
 SQLALCHEMY_DATABASE_URI = "sqlite:///notas.db"
+#SQLALCHEMY_DATABASE_URI = "mysql+pymysql://user:password@localhost:3306/volatiles"
+#SQLALCHEMY_DATABASE_URI = "postgresql+psycopg://user:password@localhost:5432/volatiles"

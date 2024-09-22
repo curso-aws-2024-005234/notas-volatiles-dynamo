@@ -84,7 +84,6 @@ def nl2br(value):
 
 if __name__ == '__main__':
     with app.app_context():
-        #create_db()
+        print("Creando base de datos")
         db.create_all()
-        #generate_key()
     #app.run(debug=True)
