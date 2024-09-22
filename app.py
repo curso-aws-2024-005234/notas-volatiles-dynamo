@@ -1,6 +1,6 @@
 import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
-from model import Nota, create_db, generate_key
+from model_sqlalchemy import Nota, db
 import re
 from markupsafe import escape
 from flask_wtf.csrf import CSRFProtect
@@ -10,6 +10,8 @@ app = Flask(__name__)
 
 # Cárgase a configuración de config.py; o arquivo config.py debe estar na mesma carpeta que app.py.
 app.config.from_pyfile('config.py')
+
+db.init_app(app)
 
 APP_BASE_URL = app.config['APP_BASE_URL']
 print(APP_BASE_URL)
@@ -25,18 +27,17 @@ def crear_nota():
     Cando se accede por GET, devólvese o formulario para crear a nota.
     Cando se accede por POST, créase a nota e devólvese o enlace para ver a nota.
     """
-    with app.app_context():
-        if request.method == 'POST':
-            if not request.form['titulo'] or not request.form['texto']:
-                flash('Falta el titulo o el texto')
-                return redirect(url_for('crear_nota'))
-            codigo = "".join(secrets.token_urlsafe(42))
-            nota = Nota(codigo=codigo, titulo=request.form['titulo'], texto=request.form['texto'])
-            nota.save()
-            return render_template('enlace.html', baseurl=APP_BASE_URL, nota=nota)
-        elif request.method == 'GET':
-            return render_template('crear_nota.html')
-
+    if request.method == 'POST':
+        if not request.form['titulo'] or not request.form['texto']:
+            flash('Falta el titulo o el texto')
+            return redirect(url_for('crear_nota'))
+        codigo = "".join(secrets.token_urlsafe(42))
+        nota = Nota(codigo=codigo, titulo=request.form['titulo'], texto=request.form['texto'])
+        db.session.add(nota)
+        db.session.commit()
+        return render_template('enlace.html', baseurl=APP_BASE_URL, nota=nota)
+    elif request.method == 'GET':
+        return render_template('crear_nota.html')
 
 @app.route('/<codigo>', methods=['GET', 'POST'])
 def ver_nota(codigo):
@@ -46,16 +47,16 @@ def ver_nota(codigo):
     lectura (mediante un formulario cun botón "Confirmar lectura").
     Cando se accede por POST, devólvese a nota e elimínase da base de datos.
     """
-    with app.app_context():
-        nota = Nota.get(codigo)
-        if nota:
-            if request.method == 'POST':
-                nota.delete()
-                return render_template('ver_nota.html', nota=nota)
-            elif request.method == 'GET':
-                return render_template('confirmar_lectura.html', nota=nota)
-        else:
-            abort(404, description="No existe la nota") 
+    nota = db.get_or_404(Nota, codigo)
+    if nota:
+        if request.method == 'POST':
+            db.session.delete(nota)
+            db.session.commit()
+            return render_template('ver_nota.html', nota=nota)
+        elif request.method == 'GET':
+            return render_template('confirmar_lectura.html', nota=nota)
+    else:
+        abort(404, description="No existe la nota") 
 
 
 
@@ -83,6 +84,7 @@ def nl2br(value):
 
 if __name__ == '__main__':
     with app.app_context():
-        create_db()
-        generate_key()
+        #create_db()
+        db.create_all()
+        #generate_key()
     app.run(debug=True)

@@ -3,6 +3,7 @@ import sqlite3
 from flask import g, current_app
 from cryptography.fernet import Fernet
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session
 from sqlalchemy import Column, Integer, String, Text, CHAR
@@ -10,59 +11,65 @@ from sqlalchemy import Column, Integer, String, Text, CHAR
 
 
 
-def get_crypt():
-    """
-    Recupera o obxecto Fernet para cifrar e descifrar datos. Este obxecto é gardado na variable global g,
-    de xeito que se crea unha única instancia por cada petición (patrón singleton).
-    """
-    fernet = getattr(g, '_crypt', None)
-    if not fernet:
-        with open(current_app.config['CRYPTO_KEY_PATH'], 'rb') as f:
-            key = f.read()
-            fernet = g._crypt = Fernet(key)
-    return fernet
+# def get_crypt():
+#     """
+#     Recupera o obxecto Fernet para cifrar e descifrar datos. Este obxecto é gardado na variable global g,
+#     de xeito que se crea unha única instancia por cada petición (patrón singleton).
+#     """
+#     fernet = getattr(g, '_crypt', None)
+#     if not fernet:
+#         with open(current_app.config['CRYPTO_KEY_PATH'], 'rb') as f:
+#             key = f.read()
+#             fernet = g._crypt = Fernet(key)
+#     return fernet
 
 
-def get_db_engine():
-    """
-    Recupera a conexión á base de datos. Esta conexión é gardada na variable global g,
-    de xeito que se crea unha única instancia por cada petición (patrón singleton).
-    """
-    con = getattr(g, '_database', None)
-    if not con:
-        con = g._database = create_engine(current_app.config['DB_URI'])
-    return con
+# def get_db_engine():
+#     """
+#     Recupera a conexión á base de datos. Esta conexión é gardada na variable global g,
+#     de xeito que se crea unha única instancia por cada petición (patrón singleton).
+#     """
+#     con = getattr(g, '_database', None)
+#     if not con:
+#         #con = g._database = create_engine(current_app.config['DB_URI'])
+#         con = g._database = create_engine(current_app.config['SQLALCHEMY_DATABASE_URI'], echo=True)
+#     return con
 
 
-def generate_key():
-    """
-    Xera unha clave de cifrado e gárdaa nun ficheiro. Dita clave empregarase para 
-    cifrar os datos das notas que se almacenan na base de datos.
-    """
-    keypath = Path(current_app.config['CRYPTO_KEY_PATH'])
-    # Comprobar si hay fichero de clave
-    if keypath.exists(): return
-    # Si no existe, generar clave
-    key = Fernet.generate_key()
-    # Guardar clave en fichero
-    with open(keypath, 'wb') as f:
-        f.write(key)
+# def generate_key():
+#     """
+#     Xera unha clave de cifrado e gárdaa nun ficheiro. Dita clave empregarase para 
+#     cifrar os datos das notas que se almacenan na base de datos.
+#     """
+#     keypath = Path(current_app.config['CRYPTO_KEY_PATH'])
+#     # Comprobar si hay fichero de clave
+#     if keypath.exists(): return
+#     # Si no existe, generar clave
+#     key = Fernet.generate_key()
+#     # Guardar clave en fichero
+#     with open(keypath, 'wb') as f:
+#         f.write(key)
 
 
 
 class Base(DeclarativeBase):
-    def save(self):
-        with Session(get_db_engine()) as session:
-            session.add(self)
-            session.commit()
+    pass
+
+    # def save(self):
+    #     with Session(get_db_engine()) as session:
+    #         session.add(self)
+    #         session.commit()
             
-    def delete(self):
-        with Session(get_db_engine()) as session:
-            session.delete(self)
-            session.commit()
+    # def delete(self):
+    #     with Session(get_db_engine()) as session:
+    #         session.delete(self)
+    #         session.commit()
 
 
-class Nota(Base):
+
+db = SQLAlchemy(model_class=Base)
+
+class Nota(db.Model):
     __tablename__ = 'notas'
 
     codigo = Column(CHAR(42), primary_key=True)
@@ -94,8 +101,8 @@ class Nota(Base):
 
 
 
-def create_db():
-    """
-    Crea a base de datos e as táboas necesarias.
-    """
-    DeclarativeBase.metadata.create_all(get_db_engine())
+# def create_db():
+#     """
+#     Crea a base de datos e as táboas necesarias.
+#     """
+#     Nota.metadata.create_all(get_db_engine())
