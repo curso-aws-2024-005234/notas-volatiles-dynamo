@@ -27,7 +27,7 @@ Unha vez que o servidor estea en marcha, pódese acceder a el a través do naveg
 A aplicación está dividida en dous módulos:
 
 - `app.py`: Contén o código da aplicación web.
-- `notas.py`: Contén o código para a xestión das notas (modelo).
+- `model.py`: Contén o código para a xestión das notas (modelo).
 
 Adicionalmente, atópanse os seguintes ficheiros que se empregan para a configuración e posta en marcha en produción:
 
