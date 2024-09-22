@@ -13,6 +13,10 @@ app.config.from_pyfile('config.py')
 
 db.init_app(app)
 
+with app.app_context():
+    print("Preparando base de datos")
+    db.create_all()
+
 APP_BASE_URL = app.config['APP_BASE_URL']
 print(APP_BASE_URL)
 
@@ -83,7 +87,4 @@ def nl2br(value):
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        print("Creando base de datos")
-        db.create_all()
-    #app.run(debug=True)
+    app.run(debug=True)
