@@ -2,6 +2,7 @@
 
 Unha aplicación para entregar notas de xeito anónimo, que se autodestrúen despois de ser lidas.
 
+
 ## Instalación
 
 Para instalar as dependencias:
@@ -11,6 +12,13 @@ pip install -r requirements.txt
 ```
 
 Recoméndase crear un entorno virtual para instalar as dependencias, para evitar problemas de compatibilidade.
+
+
+## Preparación da base de datos
+
+```bash
+aws dynamodb create-table --table-name notas --attribute-definitions AttributeName=codigo,AttributeType=S --key-schema AttributeName=codigo,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000 
+```
 
 ## Execución
 

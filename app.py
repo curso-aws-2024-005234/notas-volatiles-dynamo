@@ -1,6 +1,6 @@
 import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
-from model import Nota, db
+from model import Nota #, db
 import re
 from markupsafe import escape
 from flask_wtf.csrf import CSRFProtect
@@ -11,11 +11,11 @@ app = Flask(__name__)
 # Cárgase a configuración de config.py; o arquivo config.py debe estar na mesma carpeta que app.py.
 app.config.from_pyfile('config.py')
 
-db.init_app(app)
+# db.init_app(app)
 
 with app.app_context():
     print("Preparando base de datos")
-    db.create_all()
+    #db.create_all()
 
 APP_BASE_URL = app.config['APP_BASE_URL']
 print(APP_BASE_URL)
@@ -37,8 +37,7 @@ def crear_nota():
             return redirect(url_for('crear_nota'))
         codigo = "".join(secrets.token_urlsafe(42))
         nota = Nota(codigo=codigo, titulo=request.form['titulo'], texto=request.form['texto'])
-        db.session.add(nota)
-        db.session.commit()
+        nota.save()
         return render_template('enlace.html', baseurl=APP_BASE_URL, nota=nota)
     elif request.method == 'GET':
         return render_template('crear_nota.html')
@@ -51,11 +50,10 @@ def ver_nota(codigo):
     lectura (mediante un formulario cun botón "Confirmar lectura").
     Cando se accede por POST, devólvese a nota e elimínase da base de datos.
     """
-    nota = db.get_or_404(Nota, codigo)
+    nota = Nota.get(codigo)
     if nota:
         if request.method == 'POST':
-            db.session.delete(nota)
-            db.session.commit()
+            nota.delete()
             return render_template('ver_nota.html', nota=nota)
         elif request.method == 'GET':
             return render_template('confirmar_lectura.html', nota=nota)

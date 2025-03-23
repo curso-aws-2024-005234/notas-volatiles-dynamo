@@ -1,32 +1,43 @@
 from pathlib import Path
-import sqlite3
-from flask import g, current_app
-from cryptography.fernet import Fernet
+from flask import abort, g, current_app
 
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, Session
-from sqlalchemy import Column, Integer, String, Text, CHAR
+import boto3
+from boto3.dynamodb.types import TypeDeserializer
+from boto3.dynamodb.conditions import Key
 
 
 
-class Base(DeclarativeBase):
-    pass
 
+class Nota:
 
+    table = 'notas'
+    _pk_field = 'codigo'
+    deserializer = TypeDeserializer()
+    client = boto3.client('dynamodb', endpoint_url='http://localhost:8000', region_name='us-west-2')
+    resource = boto3.resource('dynamodb', endpoint_url='http://localhost:8000', region_name='us-west-2')
+    table = resource.Table('notas')
 
-db = SQLAlchemy(model_class=Base)
+    def __init__(self, codigo, titulo, texto, **kwargs):
+        self.codigo = codigo
+        self.titulo = titulo
+        self.texto = texto
+        self.__dict__.update(kwargs)
 
-class Nota(db.Model):
-    __tablename__ = 'notas'
-
-    codigo = Column(CHAR(60), primary_key=True)
-    titulo = Column(String(140), nullable=False)
-    texto = Column(Text(), nullable=False)
-
-    def __str__(self):
-        return f'Nota: {self.titulo}'
-
-    def __repr__(self):
-        return f'Nota(codigo={self.codigo!r}, titulo={self.titulo!r}, texto={self.texto!r})'
+    def get(pk):
+        document = Nota.table.get_item(Key={Nota._pk_field: pk})
+        if 'Item' not in document:
+            return None
+        #dd = {k: Nota.deserializer.deserialize(v) for k, v in document['Item'].items()}
+        return Nota(**document['Item'])
     
+    def save(self):
+        Nota.table.put_item(Item=self.__dict__)
+        return self
+    
+    def delete(self):
+        Nota.table.delete_item(Key={Nota._pk_field: self.codigo})
+        return self
+    
+
+
+
