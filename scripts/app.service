@@ -1,0 +1,12 @@
+[Unit]
+Description=Gunicorn instance to serve your app
+After=network.target
+
+[Service]
+User=your_user
+Group=www-data
+WorkingDirectory=/Users/jairo/Developer/notas-volatiles-dynamo
+ExecStart=/usr/bin/gunicorn --workers 3 -b 0.0.0.0:80 wsgi:app
+
+[Install]
+WantedBy=multi-user.target

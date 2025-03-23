@@ -1,6 +1,5 @@
 import secrets
 from flask import Flask, abort, render_template, request, redirect, url_for, flash
-from model import Nota #, db
 import re
 from markupsafe import escape
 from flask_wtf.csrf import CSRFProtect
@@ -8,8 +7,14 @@ from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
 
+
 # Cárgase a configuración de config.py; o arquivo config.py debe estar na mesma carpeta que app.py.
 app.config.from_pyfile('config.py')
+
+
+with app.app_context():
+    from model import Nota #, db
+
 
 # db.init_app(app)
 
